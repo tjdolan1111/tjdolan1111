@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Visualization of Street Trees in Cambridge, MA (Tim Dolan, Production 7)</title>
+  <script src="https://api.mapbox.com/mapbox-gl-js/v3.1.0/mapbox-gl.js"></script>
+  <link href="https://api.mapbox.com/mapbox-gl-js/v3.1.0/mapbox-gl.css" rel="stylesheet" />
+  <style>
+    body {
+      font-family: 'Arial', sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+    #map {
+      width: 100%;
+      height: 100vh;
+    }
+    .legend {
+      background-color: white;
+      padding: 8px 12px;
+      border-radius: 8px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+      margin: 10px;
+      max-width: 240px;
+      position: absolute;
+      bottom: 10px;
+      right: 10px;
+      z-index: 10;
+      font-size: 0.9em;
+      border-style: solid;
+      border-width: 1px;
+      border-color: black; 
+    }
+    .checkbox-container {
+      display: flex;
+      align-items: center;
+      margin-bottom: 6px;
+    }
+    .legend-color {
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      margin-right: 6px;
+      display: inline-block;
+    }
+    .zoom-links {
+      margin-top: 10px;
+    }
+    .zoom-links a {
+      display: block;
+      font-size: 0.9em;
+      color: #0077cc;
+      text-decoration: none;
+      margin-bottom: 4px;
+      cursor: pointer;
+    }
+    .zoom-links a:hover {
+      text-decoration: underline;
+    }
+
+    .source {
+      font-size: 9px;
+      margin-top: 10px;
+    }
+      .legend {
+        max-width: 90%;
+        padding: 6px 10px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div id="map"></div>
+  <div class="legend">
+    <h3>Legend</h3>
+    <div class="checkbox-container"><input type="checkbox" id="Oak" checked><label for="Oak"><span class="legend-color" style="background-color: #6f42bd;"></span> Oak</label></div>
+    <div class="checkbox-container"><input type="checkbox" id="Maple" checked><label for="Maple"><span class="legend-color" style="background-color: #c25151;"></span> Maple</label></div>
+    <div class="checkbox-container"><input type="checkbox" id="Locust" checked><label for="Locust"><span class="legend-color" style="background-color: #cfd917;"></span> Locust</label></div>
+    <div class="checkbox-container"><input type="checkbox" id="Linden" checked><label for="Linden"><span class="legend-color" style="background-color: #f2aa9c;"></span> Linden</label></div>
+    <div class="checkbox-container"><input type="checkbox" id="Elm or Zelkova" checked><label for="Elm or Zelkova"><span class="legend-color" style="background-color: #1c8dce;"></span> Elm or Zelkova</label></div>
+    <div class="checkbox-container"><input type="checkbox" id="Plane" checked><label for="Plane"><span class="legend-color" style="background-color: #157a31;"></span> Plane</label></div>
+    <div class="checkbox-container"><input type="checkbox" id="Other" checked><label for="Other"><span class="legend-color" style="background-color: #454545;"></span> Other</label></div>
+
+    <div class="zoom-links">
+      <h4>Zoom to:</h4>
+      <a onclick="zoomToLocation(42.358583605515925, -71.09355451107481)">MIT</a>
+      <a onclick="zoomToLocation(42.373471867250515, -71.1188944056484)">Harvard Square</a>
+      <a onclick="zoomToLocation(42.39528931536716, -71.14183145485327)">Alewife</a>
+      <a onclick="zoomToLocation(42.379714827952554, -71.13325485275705)">West Cambridge</a>
+      <a onclick="zoomToLocation(42.36006455703243, -71.10773358510889)">Cambridgeport</a>
+    </div>
+
+    <p class="source">2018 Data from the <a href="https://www.cambridgema.gov/GIS/gisdatadictionary/Environmental/ENVIRONMENTAL_TreeCanopy2018" target="_blank">City of Cambridge</a></p>
+  </div>
+
+  <script>
+    mapboxgl.accessToken = 'pk.eyJ1IjoidGRvbGFuIiwiYSI6ImNtOWEwZWNraDAwZmEycnByd3R4N3hsemgifQ.XegwbSmKewEPqmXR0Z8BiQ';
+    const map = new mapboxgl.Map({
+      container: 'map',
+      style: 'mapbox://styles/tdolan/cm9hc9tis00iq01r3e2b73drm',
+      center: [-71.1054, 42.3651],
+      zoom: 15
+    });
+
+    const treeLayers = [
+      "Oak", "Maple", "Locust", "Linden",
+      "Elm or Zelkova", "Plane", "Other"
+    ];
+
+    map.on('load', () => {
+      treeLayers.forEach(type => {
+        const checkbox = document.getElementById(type);
+        if (checkbox) {
+          checkbox.addEventListener('change', () => {
+            if (map.getLayer(type)) {
+              map.setLayoutProperty(type, 'visibility', checkbox.checked ? 'visible' : 'none');
+            }
+          });
+        }
+      });
+    });
+
+    function zoomToLocation(lat, lng) {
+      map.flyTo({
+        center: [lng, lat],
+        zoom: 16, // Fixed zoom level
+        essential: true
+      });
+    }
+
+  </script>
+</body>
+</html>
